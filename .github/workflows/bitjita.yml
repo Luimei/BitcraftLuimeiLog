@@ -1,0 +1,43 @@
+name: Bitjita Storage Notifier
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run notifier
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          BITJITA_CLAIM_ID: ${{ vars.BITJITA_CLAIM_ID }}
+        run: node bitjita-actions.js
+
+      - name: Commit updated state
+        run: |
+          if git diff --quiet -- bitjita_storage_state.json; then
+            echo "No state changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bitjita_storage_state.json
+          git commit -m "Update Bitjita notifier state"
+          git push
