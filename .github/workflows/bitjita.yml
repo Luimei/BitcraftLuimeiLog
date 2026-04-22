@@ -1,5 +1,9 @@
 name: Bitjita Storage Notifier
 
+concurrency:
+  group: bitjita-storage-notifier
+  cancel-in-progress: false
+
 on:
   workflow_dispatch:
   schedule:
