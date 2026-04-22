@@ -23,20 +23,16 @@
       "name": "Simple Stone Chest"
     },
     {
-      "entityId": "864691128497532970",
-      "name": "cdx stone"
+      "entityId": "864691128497535269",
+      "name": "cdx leather"
     },
     {
       "entityId": "864691128497531673",
       "name": "cdx codex"
     },
     {
-      "entityId": "864691128497535269",
-      "name": "cdx leather"
-    },
-    {
-      "entityId": "864691128497532842",
-      "name": "cdx wood"
+      "entityId": "864691128497532970",
+      "name": "cdx stone"
     },
     {
       "entityId": "864691128497535547",
@@ -77,12 +73,8 @@
     {
       "entityId": "864691128528621272",
       "name": "Logcraft Cargo Bin"
-    },
-    {
-      "entityId": "864691128528625895",
-      "name": "Logcraft Item Storage"
     }
   ],
   "initialized": true,
-  "updatedAt": "2026-04-22T19:11:54.010Z"
+  "updatedAt": "2026-04-22T20:14:56.729Z"
 }
