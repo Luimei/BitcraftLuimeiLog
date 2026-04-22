@@ -40,4 +40,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add bitjita_storage_state.json
           git commit -m "Update Bitjita notifier state"
-          git push
+
+          git pull --rebase origin main
+          git push origin main
