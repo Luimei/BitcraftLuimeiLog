@@ -1,6 +1,88 @@
 {
-  "lastSeenLogIds": {},
-  "cachedBuildings": [],
-  "initialized": false,
-  "updatedAt": null
+  "lastSeenLogIds": {
+    "864691128509625211": "4850105",
+    "864691128497532970": "4742160",
+    "864691128497531673": "4896886",
+    "864691128497535269": "4663385",
+    "864691128497532842": "4911058",
+    "864691128497535547": "4911018",
+    "864691128497538739": "4911039",
+    "864691128497535429": "4911049",
+    "864691128528626679": "4855042",
+    "864691128528580173": "4822332",
+    "864691128528580182": "4753023",
+    "864691128528622788": "4767058",
+    "864691128528624431": "4222364",
+    "864691128528626445": "4747389",
+    "864691128528621272": "4221855",
+    "864691128528625895": "4570823"
+  },
+  "cachedBuildings": [
+    {
+      "entityId": "864691128509625211",
+      "name": "Simple Stone Chest"
+    },
+    {
+      "entityId": "864691128497532970",
+      "name": "cdx stone"
+    },
+    {
+      "entityId": "864691128497531673",
+      "name": "cdx codex"
+    },
+    {
+      "entityId": "864691128497535269",
+      "name": "cdx leather"
+    },
+    {
+      "entityId": "864691128497532842",
+      "name": "cdx wood"
+    },
+    {
+      "entityId": "864691128497535547",
+      "name": "cdx cloth"
+    },
+    {
+      "entityId": "864691128497538739",
+      "name": "Food"
+    },
+    {
+      "entityId": "864691128497535429",
+      "name": "cdx ingot"
+    },
+    {
+      "entityId": "864691128528626679",
+      "name": "Talented Woodcraft Item Storage"
+    },
+    {
+      "entityId": "864691128528580173",
+      "name": "Talented Woodcraft Item Storage"
+    },
+    {
+      "entityId": "864691128528580182",
+      "name": "Talented Woodcraft Item Storage"
+    },
+    {
+      "entityId": "864691128528622788",
+      "name": "Logcraft Cargo Bin"
+    },
+    {
+      "entityId": "864691128528624431",
+      "name": "Logcraft Cargo Bin"
+    },
+    {
+      "entityId": "864691128528626445",
+      "name": "Logcraft Cargo Bin"
+    },
+    {
+      "entityId": "864691128528621272",
+      "name": "Logcraft Cargo Bin"
+    },
+    {
+      "entityId": "864691128528625895",
+      "name": "Logcraft Item Storage"
+    }
+  ],
+  "initialized": true,
+  "updatedAt": "2026-04-22T14:24:35.172Z"
 }
