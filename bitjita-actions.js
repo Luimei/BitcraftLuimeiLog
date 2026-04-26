@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 const CONFIG = {
-  claimId: process.env.BITJITA_CLAIM_ID || 'PUT_CLAIM_ID_HERE',
-  discordWebhookUrl: process.env.DISCORD_WEBHOOK_URL || 'PUT_DISCORD_WEBHOOK_URL_HERE',
+  claimId: process.env.BITJITA_CLAIM_ID || '864691128473724893',
+  discordWebhookUrl: process.env.DISCORD_WEBHOOK_URL || 'https://discord.com/api/webhooks/1496513939872157716/Vp2bIHVIaoQCb_5X7xb5FkoqUnYB6wr5WcrK7vxC4AruV0fIu172GxeI_WWENH4eGBF9',
   pollLimit: Number(process.env.BITJITA_LIMIT || '100'),
   notifyDeposits: true,
   notifyWithdraws: false,
