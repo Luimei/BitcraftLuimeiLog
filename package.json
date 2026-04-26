@@ -1,1 +1,9 @@
-
+{
+  "name": "bitjitabot-github-actions",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bitjita claim storage notifier for GitHub Actions",
+  "scripts": {
+    "start": "node bitjita-actions.js"
+  }
+}
