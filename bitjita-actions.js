@@ -51,10 +51,10 @@ function loadState() {
 function saveState(state) {
   state.updatedAt = new Date().toISOString();
 
-  // 念のため古いものを切り詰める
   if (!Array.isArray(state.recentProcessedLogIds)) {
     state.recentProcessedLogIds = [];
   }
+
   if (state.recentProcessedLogIds.length > 1000) {
     state.recentProcessedLogIds = state.recentProcessedLogIds.slice(-1000);
   }
@@ -159,22 +159,48 @@ function shouldNotify(log) {
   return false;
 }
 
-function formatLogMessage(log, maps, fallbackBuildingName) {
-  const type = log?.data?.type;
-  const playerName = log?.subjectName || 'Unknown';
-  const quantity = log?.data?.quantity ?? 0;
-  const itemName = getItemName(log, maps);
-  const buildingName = fallbackBuildingName || log?.building?.buildingName || 'Unknown Building';
-
-  if (type === 'deposit_item') {
-    return `📦 納品通知\n${playerName} が **${itemName}** を **${quantity}個** 納品しました\n建物: ${buildingName}`;
+function formatLogMessage(group) {
+  if (group.type === 'deposit_item') {
+    return `📦 納品通知\n${group.playerName} が **${group.itemName}** を **${group.quantity}個** 納品しました\n建物: ${group.buildingName}`;
   }
 
-  if (type === 'withdraw_item') {
-    return `📤 引き出し通知\n${playerName} が **${itemName}** を **${quantity}個** 引き出しました\n建物: ${buildingName}`;
+  if (group.type === 'withdraw_item') {
+    return `📤 引き出し通知\n${group.playerName} が **${group.itemName}** を **${group.quantity}個** 引き出しました\n建物: ${group.buildingName}`;
   }
 
   return null;
+}
+
+function aggregateLogs(logs, maps, fallbackBuildingName) {
+  const grouped = new Map();
+
+  for (const log of logs) {
+    const type = log?.data?.type;
+    const playerName = log?.subjectName || 'Unknown';
+    const itemName = getItemName(log, maps);
+    const buildingName =
+      fallbackBuildingName || log?.building?.buildingName || 'Unknown Building';
+    const quantity = Number(log?.data?.quantity ?? 0);
+
+    const key = [type, playerName, itemName, buildingName].join('||');
+
+    if (!grouped.has(key)) {
+      grouped.set(key, {
+        type,
+        playerName,
+        itemName,
+        buildingName,
+        quantity: 0,
+        logIds: [],
+      });
+    }
+
+    const row = grouped.get(key);
+    row.quantity += quantity;
+    row.logIds.push(String(log.id));
+  }
+
+  return Array.from(grouped.values());
 }
 
 async function sendDiscordWebhook(content) {
@@ -221,7 +247,7 @@ async function pollBuildingLogs(building, state, isFirstRun) {
     return Number(log.id) > prevNum;
   });
 
-  let sentCount = 0;
+  const filteredLogs = [];
 
   for (const log of newLogs) {
     if (!shouldNotify(log)) continue;
@@ -231,12 +257,27 @@ async function pollBuildingLogs(building, state, isFirstRun) {
       continue;
     }
 
-    const msg = formatLogMessage(log, maps, building.name);
+    filteredLogs.push(log);
+  }
+
+  const aggregated = aggregateLogs(filteredLogs, maps, building.name);
+
+  let sentCount = 0;
+
+  for (const group of aggregated) {
+    const msg = formatLogMessage(group);
     if (!msg) continue;
 
-    console.log(`Sending notification for building ${building.entityId}, log ${log.id}`);
+    console.log(
+      `Sending aggregated notification: ${group.playerName} / ${group.itemName} / ${group.quantity}`
+    );
+
     await sendDiscordWebhook(msg);
-    markProcessedLog(state, log.id);
+
+    for (const logId of group.logIds) {
+      markProcessedLog(state, logId);
+    }
+
     sentCount++;
     await sleep(300);
   }
