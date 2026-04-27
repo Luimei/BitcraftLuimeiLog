@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 const CONFIG = {
-  claimId: process.env.BITJITA_CLAIM_ID || '864691128473724893',
-  discordWebhookUrl: process.env.DISCORD_WEBHOOK_URL || 'https://discord.com/api/webhooks/1496513939872157716/Vp2bIHVIaoQCb_5X7xb5FkoqUnYB6wr5WcrK7vxC4AruV0fIu172GxeI_WWENH4eGBF9',
+  claimId: process.env.BITJITA_CLAIM_ID || 'PUT_CLAIM_ID_HERE',
+  discordWebhookUrl: process.env.DISCORD_WEBHOOK_URL || 'PUT_DISCORD_WEBHOOK_URL_HERE',
   pollLimit: Number(process.env.BITJITA_LIMIT || '100'),
   notifyDeposits: true,
   notifyWithdraws: false,
@@ -26,7 +26,14 @@ function sleep(ms) {
 function loadState() {
   try {
     if (fs.existsSync(CONFIG.stateFile)) {
-      return JSON.parse(fs.readFileSync(CONFIG.stateFile, 'utf8'));
+      const loaded = JSON.parse(fs.readFileSync(CONFIG.stateFile, 'utf8'));
+      return {
+        lastSeenLogIds: loaded.lastSeenLogIds || {},
+        cachedBuildings: loaded.cachedBuildings || [],
+        initialized: Boolean(loaded.initialized),
+        updatedAt: loaded.updatedAt || null,
+        recentProcessedLogIds: loaded.recentProcessedLogIds || [],
+      };
     }
   } catch (err) {
     console.error('Failed to load state:', err);
@@ -37,12 +44,32 @@ function loadState() {
     cachedBuildings: [],
     initialized: false,
     updatedAt: null,
+    recentProcessedLogIds: [],
   };
 }
 
 function saveState(state) {
   state.updatedAt = new Date().toISOString();
+
+  // 念のため古いものを切り詰める
+  if (!Array.isArray(state.recentProcessedLogIds)) {
+    state.recentProcessedLogIds = [];
+  }
+  if (state.recentProcessedLogIds.length > 1000) {
+    state.recentProcessedLogIds = state.recentProcessedLogIds.slice(-1000);
+  }
+
   fs.writeFileSync(CONFIG.stateFile, JSON.stringify(state, null, 2), 'utf8');
+}
+
+function hasProcessedLog(state, logId) {
+  return (state.recentProcessedLogIds || []).includes(String(logId));
+}
+
+function markProcessedLog(state, logId) {
+  const ids = new Set(state.recentProcessedLogIds || []);
+  ids.add(String(logId));
+  state.recentProcessedLogIds = Array.from(ids).slice(-1000);
 }
 
 async function fetchJson(url) {
@@ -85,7 +112,14 @@ async function fetchClaimBuildings() {
   return buildings
     .map((b) => ({
       entityId: String(b.entityId ?? b.id ?? ''),
-      name: b.buildingNickname || b.nickname || b.customName || b.displayName || b.buildingName || b.name || 'Unknown Building',
+      name:
+        b.buildingNickname ||
+        b.nickname ||
+        b.customName ||
+        b.displayName ||
+        b.buildingName ||
+        b.name ||
+        'Unknown Building',
     }))
     .filter((b) => b.entityId);
 }
@@ -164,7 +198,7 @@ async function pollBuildingLogs(building, state, isFirstRun) {
   const logs = Array.isArray(payload.logs) ? payload.logs : [];
 
   if (logs.length === 0) {
-    return;
+    return 0;
   }
 
   const maps = buildItemMaps(payload);
@@ -178,7 +212,7 @@ async function pollBuildingLogs(building, state, isFirstRun) {
 
   if (isFirstRun && !previousId) {
     state.lastSeenLogIds[building.entityId] = newestId;
-    return;
+    return 0;
   }
 
   const prevNum = previousId ? Number(previousId) : null;
@@ -187,18 +221,28 @@ async function pollBuildingLogs(building, state, isFirstRun) {
     return Number(log.id) > prevNum;
   });
 
+  let sentCount = 0;
+
   for (const log of newLogs) {
     if (!shouldNotify(log)) continue;
+
+    if (hasProcessedLog(state, log.id)) {
+      console.log(`Skipping duplicate log ${log.id}`);
+      continue;
+    }
 
     const msg = formatLogMessage(log, maps, building.name);
     if (!msg) continue;
 
     console.log(`Sending notification for building ${building.entityId}, log ${log.id}`);
     await sendDiscordWebhook(msg);
+    markProcessedLog(state, log.id);
+    sentCount++;
     await sleep(300);
   }
 
   state.lastSeenLogIds[building.entityId] = newestId;
+  return sentCount;
 }
 
 async function main() {
@@ -214,17 +258,22 @@ async function main() {
   const isFirstRun = !state.initialized;
   console.log(`Loaded ${buildings.length} buildings for claim ${CONFIG.claimId}`);
 
+  let totalSent = 0;
+
   for (const building of buildings) {
     try {
-      await pollBuildingLogs(building, state, isFirstRun);
+      const sent = await pollBuildingLogs(building, state, isFirstRun);
+      totalSent += sent;
       await sleep(150);
     } catch (err) {
-      console.error(`Failed building ${building.entityId}:`, err.message);
+      console.error(`Failed building ${building.entityId}: ${err.message}`);
     }
   }
 
   state.initialized = true;
   saveState(state);
+
+  console.log(`Notifications sent: ${totalSent}`);
   console.log('Done.');
 }
 
