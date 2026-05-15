@@ -19,24 +19,24 @@
   },
   "cachedBuildings": [
     {
-      "entityId": "864691128497532842",
-      "name": "cdx wood"
-    },
-    {
-      "entityId": "864691128497531673",
-      "name": "cdx codex"
+      "entityId": "864691128509625211",
+      "name": "Simple Stone Chest"
     },
     {
       "entityId": "864691128497532970",
       "name": "cdx stone"
     },
     {
+      "entityId": "864691128497531673",
+      "name": "cdx codex"
+    },
+    {
       "entityId": "864691128497535269",
       "name": "cdx leather"
     },
     {
-      "entityId": "864691128497535429",
-      "name": "cdx ingot"
+      "entityId": "864691128497532842",
+      "name": "cdx wood"
     },
     {
       "entityId": "864691128497535547",
@@ -47,7 +47,15 @@
       "name": "Food"
     },
     {
+      "entityId": "864691128497535429",
+      "name": "cdx ingot"
+    },
+    {
       "entityId": "864691128528626679",
+      "name": "Talented Woodcraft Item Storage"
+    },
+    {
+      "entityId": "864691128528580173",
       "name": "Talented Woodcraft Item Storage"
     },
     {
@@ -76,7 +84,7 @@
     }
   ],
   "initialized": true,
-  "updatedAt": "2026-05-15T01:32:00.370Z",
+  "updatedAt": "2026-05-15T05:37:57.453Z",
   "recentProcessedLogIds": [
     "5115708",
     "5115717",
