@@ -31,10 +31,6 @@
       "name": "cdx codex"
     },
     {
-      "entityId": "864691128497535269",
-      "name": "cdx leather"
-    },
-    {
       "entityId": "864691128497532842",
       "name": "cdx wood"
     },
@@ -71,10 +67,6 @@
       "name": "Logcraft Cargo Bin"
     },
     {
-      "entityId": "864691128528626445",
-      "name": "Logcraft Cargo Bin"
-    },
-    {
       "entityId": "864691128528621272",
       "name": "Logcraft Cargo Bin"
     },
@@ -84,7 +76,7 @@
     }
   ],
   "initialized": true,
-  "updatedAt": "2026-05-16T23:32:04.607Z",
+  "updatedAt": "2026-05-17T01:29:22.914Z",
   "recentProcessedLogIds": [
     "5115708",
     "5115717",
